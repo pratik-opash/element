@@ -1,5 +1,6 @@
 const Project = require("../models/project");
 const asyncHandler = require("../utils/asyncHandler");
+const { uploadOnCloudinary } = require("../utils/cloudinary");
 
 exports.getProjects = asyncHandler(async (_req, res) => {
   const projects = await Project.find().sort({ createdAt: -1 });
@@ -16,8 +17,10 @@ exports.getProjectById = asyncHandler(async (req, res) => {
 
 exports.createProject = asyncHandler(async (req, res) => {
   if (req.file) {
-    const fileUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
-    req.body.imageUrl = fileUrl;
+    const cloudinaryResponse = await uploadOnCloudinary(req.file.path);
+    if (cloudinaryResponse) {
+      req.body.imageUrl = cloudinaryResponse.secure_url;
+    }
   }
 
   const project = await Project.create(req.body);
@@ -26,8 +29,10 @@ exports.createProject = asyncHandler(async (req, res) => {
 
 exports.updateProject = asyncHandler(async (req, res) => {
   if (req.file) {
-    const fileUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
-    req.body.imageUrl = fileUrl;
+    const cloudinaryResponse = await uploadOnCloudinary(req.file.path);
+    if (cloudinaryResponse) {
+      req.body.imageUrl = cloudinaryResponse.secure_url;
+    }
   }
 
   const project = await Project.findByIdAndUpdate(req.params.id, req.body, {

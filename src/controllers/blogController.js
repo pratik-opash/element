@@ -1,5 +1,6 @@
 const BlogPost = require("../models/blogPost");
 const asyncHandler = require("../utils/asyncHandler");
+const { uploadOnCloudinary } = require("../utils/cloudinary");
 
 exports.getBlogs = asyncHandler(async (_req, res) => {
   const posts = await BlogPost.find().sort({ createdAt: -1 });
@@ -16,8 +17,10 @@ exports.getBlogById = asyncHandler(async (req, res) => {
 
 exports.createBlog = asyncHandler(async (req, res) => {
   if (req.file) {
-    const fileUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
-    req.body.imageUrl = fileUrl;
+    const cloudinaryResponse = await uploadOnCloudinary(req.file.path);
+    if (cloudinaryResponse) {
+      req.body.imageUrl = cloudinaryResponse.secure_url;
+    }
   }
 
   const post = await BlogPost.create(req.body);
@@ -26,8 +29,10 @@ exports.createBlog = asyncHandler(async (req, res) => {
 
 exports.updateBlog = asyncHandler(async (req, res) => {
   if (req.file) {
-    const fileUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
-    req.body.imageUrl = fileUrl;
+    const cloudinaryResponse = await uploadOnCloudinary(req.file.path);
+    if (cloudinaryResponse) {
+      req.body.imageUrl = cloudinaryResponse.secure_url;
+    }
   }
 
   const post = await BlogPost.findByIdAndUpdate(req.params.id, req.body, {
