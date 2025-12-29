@@ -16,13 +16,19 @@ exports.getProjectById = asyncHandler(async (req, res) => {
 });
 
 exports.createProject = asyncHandler(async (req, res) => {
+  console.log("createProject hit. req.file:", req.file);
+  console.log("req.body before:", req.body);
+
   if (req.file) {
     const cloudinaryResponse = await uploadOnCloudinary(req.file.path);
+    console.log("Cloudinary Response:", cloudinaryResponse);
+
     if (cloudinaryResponse) {
       req.body.imageUrl = cloudinaryResponse.secure_url;
     }
   }
 
+  console.log("req.body after upload:", req.body);
   const project = await Project.create(req.body);
   res.status(201).json(project);
 });
