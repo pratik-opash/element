@@ -2,9 +2,27 @@ const BlogPost = require("../models/blogPost");
 const asyncHandler = require("../utils/asyncHandler");
 const { uploadOnCloudinary } = require("../utils/cloudinary");
 
-exports.getBlogs = asyncHandler(async (_req, res) => {
-  const posts = await BlogPost.find().sort({ createdAt: -1 });
-  res.json(posts);
+exports.getBlogs = asyncHandler(async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const skip = (page - 1) * limit;
+
+  const posts = await BlogPost.find()
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit);
+
+  const total = await BlogPost.countDocuments();
+
+  res.json({
+    data: posts,
+    pagination: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    },
+  });
 });
 
 exports.getBlogById = asyncHandler(async (req, res) => {

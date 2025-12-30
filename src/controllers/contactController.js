@@ -1,9 +1,27 @@
 const Contact = require("../models/contact");
 const asyncHandler = require("../utils/asyncHandler");
 
-exports.getContacts = asyncHandler(async (_req, res) => {
-    const contacts = await Contact.find().sort({ createdAt: -1 });
-    res.json(contacts);
+exports.getContacts = asyncHandler(async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const contacts = await Contact.find()
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit);
+
+    const total = await Contact.countDocuments();
+
+    res.json({
+        data: contacts,
+        pagination: {
+            total,
+            page,
+            limit,
+            totalPages: Math.ceil(total / limit),
+        },
+    });
 });
 
 exports.createContact = asyncHandler(async (req, res) => {
