@@ -45,7 +45,7 @@ async function testAuth() {
         let res = await request('/api/auth/register', 'POST', {
             name: 'Test', email, password: 'pw1'
         });
-        console.log('1. Register:', res.statusCode);
+        // console.log('1. Register:', res.statusCode);
 
         // 2. Login
         res = await request('/api/auth/login', 'POST', { email, password: 'pw1' });
