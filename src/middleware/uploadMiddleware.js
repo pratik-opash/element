@@ -1,10 +1,15 @@
 const multer = require('multer');
 const path = require('path');
 
+const os = require('os');
+const fs = require('fs');
+
 // Configure Storage
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, 'uploads/');
+        // Use system temp directory which works on Vercel/AWS Lambda
+        const tempDir = os.tmpdir();
+        cb(null, tempDir);
     },
     filename: function (req, file, cb) {
         // Create unique filename: fieldname-timestamp.ext
