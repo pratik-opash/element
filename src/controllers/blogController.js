@@ -1,6 +1,6 @@
 const BlogPost = require("../models/blogPost");
 const asyncHandler = require("../utils/asyncHandler");
-const { uploadOnCloudinary } = require("../utils/cloudinary");
+const { uploadFromBuffer } = require("../utils/cloudinary");
 
 exports.getBlogs = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page) || 1;
@@ -35,7 +35,7 @@ exports.getBlogById = asyncHandler(async (req, res) => {
 
 exports.createBlog = asyncHandler(async (req, res) => {
   if (req.file) {
-    const cloudinaryResponse = await uploadOnCloudinary(req.file.path);
+    const cloudinaryResponse = await uploadFromBuffer(req.file.buffer);
     if (cloudinaryResponse) {
       req.body.imageUrl = cloudinaryResponse.secure_url;
     }
@@ -47,7 +47,7 @@ exports.createBlog = asyncHandler(async (req, res) => {
 
 exports.updateBlog = asyncHandler(async (req, res) => {
   if (req.file) {
-    const cloudinaryResponse = await uploadOnCloudinary(req.file.path);
+    const cloudinaryResponse = await uploadFromBuffer(req.file.buffer);
     if (cloudinaryResponse) {
       req.body.imageUrl = cloudinaryResponse.secure_url;
     }

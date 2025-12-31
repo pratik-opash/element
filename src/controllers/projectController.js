@@ -1,6 +1,6 @@
 const Project = require("../models/project");
 const asyncHandler = require("../utils/asyncHandler");
-const { uploadOnCloudinary } = require("../utils/cloudinary");
+const { uploadFromBuffer } = require("../utils/cloudinary");
 
 exports.getProjects = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page) || 1;
@@ -34,26 +34,21 @@ exports.getProjectById = asyncHandler(async (req, res) => {
 });
 
 exports.createProject = asyncHandler(async (req, res) => {
-  console.log("createProject hit. req.file:", req.file);
-  console.log("req.body before:", req.body);
-
   if (req.file) {
-    const cloudinaryResponse = await uploadOnCloudinary(req.file.path);
-    console.log("Cloudinary Response:", cloudinaryResponse);
+    const cloudinaryResponse = await uploadFromBuffer(req.file.buffer);
 
     if (cloudinaryResponse) {
       req.body.imageUrl = cloudinaryResponse.secure_url;
     }
   }
 
-  console.log("req.body after upload:", req.body);
   const project = await Project.create(req.body);
   res.status(201).json(project);
 });
 
 exports.updateProject = asyncHandler(async (req, res) => {
   if (req.file) {
-    const cloudinaryResponse = await uploadOnCloudinary(req.file.path);
+    const cloudinaryResponse = await uploadFromBuffer(req.file.buffer);
     if (cloudinaryResponse) {
       req.body.imageUrl = cloudinaryResponse.secure_url;
     }

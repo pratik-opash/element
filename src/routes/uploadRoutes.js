@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const upload = require('../middleware/uploadMiddleware');
-const { uploadOnCloudinary } = require('../utils/cloudinary');
+const { uploadFromBuffer } = require('../utils/cloudinary');
 
 // Upload Endpoint
 router.post('/', upload.single('file'), async (req, res) => {
@@ -11,7 +11,7 @@ router.post('/', upload.single('file'), async (req, res) => {
         }
 
         // Upload to Cloudinary
-        const cloudinaryResponse = await uploadOnCloudinary(req.file.path);
+        const cloudinaryResponse = await uploadFromBuffer(req.file.buffer);
 
         if (!cloudinaryResponse) {
             return res.status(500).json({ status: 'error', message: 'Failed to upload to Cloudinary' });
